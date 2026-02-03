@@ -1,0 +1,247 @@
+<style>
+  /* Coupon Widget Styles */
+  #benefills-coupon-trigger {
+    display: inline-block;
+    margin-top: 8px;
+    color: #2b5a41; /* Brand green color - adjusting to match natural theme */
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+    font-family: inherit;
+  }
+
+  #benefills-coupon-trigger:hover {
+    opacity: 0.8;
+  }
+
+  #coupon-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    z-index: 999999;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+  }
+
+  #coupon-modal {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    animation: couponSlideUp 0.3s ease-out;
+  }
+
+  @keyframes couponSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .coupon-modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .coupon-modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #111827;
+  }
+
+  .coupon-close {
+    cursor: pointer;
+    font-size: 24px;
+    color: #9ca3af;
+    line-height: 1;
+  }
+
+  .coupon-list {
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .coupon-card {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    position: relative;
+    background: #fdfdfd;
+    transition: border-color 0.2s;
+  }
+
+  .coupon-card:hover {
+    border-color: #2b5a41;
+  }
+
+  .coupon-code-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .coupon-code {
+    background: #eefdf5;
+    color: #2b5a41;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-family: monospace;
+    font-size: 16px;
+    letter-spacing: 1px;
+  }
+
+  .coupon-apply-btn {
+    background: #2b5a41;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .coupon-apply-btn:hover {
+    background: #1e3f2d;
+  }
+
+  .coupon-desc {
+    font-size: 14px;
+    color: #4b5563;
+    margin: 4px 0;
+  }
+
+  .coupon-criteria {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+</style>
+
+<div id="coupon-modal-overlay">
+  <div id="coupon-modal">
+    <div class="coupon-modal-header">
+      <h3>Available Offers</h3>
+      <span class="coupon-close">&times;</span>
+    </div>
+    <div class="coupon-list">
+      <!-- Coupon 1 -->
+      <div class="coupon-card">
+        <div class="coupon-code-row">
+          <span class="coupon-code">FIRSTLOVE20</span>
+          <button class="coupon-apply-btn" onclick="applyCoupon('FIRSTLOVE20')">Apply</button>
+        </div>
+        <p class="coupon-desc">Get 20% OFF on your order.</p>
+        <div class="coupon-criteria">Valid on all products • First time users</div>
+      </div>
+      
+      <!-- Coupon 2 -->
+      <div class="coupon-card">
+        <div class="coupon-code-row">
+          <span class="coupon-code">SAVE20</span>
+          <button class="coupon-apply-btn" onclick="applyCoupon('SAVE20')">Apply</button>
+        </div>
+        <p class="coupon-desc">Flat 20% OFF premium health seeds.</p>
+        <div class="coupon-criteria">No minimum purchase</div>
+      </div>
+
+      <!-- Coupon 3 -->
+      <div class="coupon-card">
+        <div class="coupon-code-row">
+          <span class="coupon-code">SAVE10</span>
+          <button class="coupon-apply-btn" onclick="applyCoupon('SAVE10')">Apply</button>
+        </div>
+        <p class="coupon-desc">Save 10% on your entire cart.</p>
+        <div class="coupon-criteria">Valid on sitewide orders</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    function injectTrigger() {
+      // Check if already injected
+      if (document.getElementById('benefills-coupon-trigger')) return;
+
+      const discountField = document.querySelector('.discount-field');
+      if (discountField) {
+        const trigger = document.createElement('div');
+        trigger.id = 'benefills-coupon-trigger';
+        trigger.innerHTML = 'View Available Coupons';
+        trigger.onclick = () => {
+          document.getElementById('coupon-modal-overlay').style.display = 'flex';
+        };
+        
+        // Insert after the discount field container
+        discountField.parentElement.appendChild(trigger);
+      }
+    }
+
+    // Modal Close Logic
+    const overlay = document.getElementById('coupon-modal-overlay');
+    const closeBtn = document.querySelector('.coupon-close');
+    
+    if (closeBtn) {
+      closeBtn.onclick = () => overlay.style.display = 'none';
+    }
+    
+    if (overlay) {
+      overlay.onclick = (e) => {
+        if (e.target === overlay) overlay.style.display = 'none';
+      };
+    }
+
+    // Apply Coupon Logic
+    window.applyCoupon = function(code) {
+      const input = document.getElementById('discountCode');
+      const applyBtn = document.querySelector('.discount-field__button');
+      
+      if (input && applyBtn) {
+        input.value = code;
+        // Trigger React/input events
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        setTimeout(() => {
+          applyBtn.click();
+          overlay.style.display = 'none';
+        }, 100);
+      } else {
+        alert('Could not find discount field. Please refresh or try again.');
+        overlay.style.display = 'none';
+      }
+    };
+
+    // Watch for DOM changes (Hostinger checkout is dynamic)
+    const observer = new MutationObserver((mutations) => {
+      injectTrigger();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Initial run
+    injectTrigger();
+  })();
+</script>
