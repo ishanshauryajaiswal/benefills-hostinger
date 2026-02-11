@@ -1,0 +1,6 @@
+openai
+python-dotenv
+anthropic
+requests
+pydantic
+argparse

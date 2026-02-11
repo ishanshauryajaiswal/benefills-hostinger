@@ -1,0 +1,26 @@
+# Environment variables
+.env
+**/.env
+content/.env
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Project specific ignores
+content/logs/
+content/temp/
+content/outputs/
+content/temp/*
+content/logs/*
+content/outputs/*
+
+# Local settings
+.vscode/
+.idea/

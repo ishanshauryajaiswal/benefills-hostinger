@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Ensure we are in the project root
+ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Check if .env exists
+if [ ! -f "$ROOT_DIR/content/.env" ]; then
+    echo "Warning: content/.env not found. Using mock mode if keys are missing."
+fi
+
+# Run the python orchestrator
+python3 "$ROOT_DIR/content/main.py" "$@"
