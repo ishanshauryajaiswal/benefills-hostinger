@@ -41,9 +41,41 @@ class MockImageProvider(ImageProvider):
             f.write(f"MOCK IMAGE for prompt: {prompt}")
         return output_path
 
+class GoogleImageProvider(ImageProvider):
+    def __init__(self):
+        self.api_key = os.getenv("GOOGLE_API_KEY")
+        if not self.api_key:
+            raise ValueError("GOOGLE_API_KEY not found in .env")
+        
+        import google.generativeai as genai
+        genai.configure(api_key=self.api_key)
+        # Using the advanced Imagen model (NanoBanana Pro)
+        # Fallback logic for model naming variations
+        self.model_name = os.getenv("GOOGLE_IMAGE_MODEL", "imagen-3.0-generate-001")
+
+    def generate_image(self, prompt: str, output_path: str) -> str:
+        import google.generativeai as genai
+        model = genai.ImageModel(self.model_name)
+        
+        # NanoBanana Pro supports high quality and 1:1 or other aspects via prompt
+        # but the SDK usually has specific parameters
+        response = model.generate_images(
+            prompt=prompt,
+            number_of_images=1,
+            # safety_setting="BLOCK_ONLY_HIGH"
+        )
+        
+        if response.images:
+            response.images[0].save(output_path)
+            return output_path
+        else:
+            raise Exception("Google AI failed to generate image.")
+
 class ImageFactory:
     @staticmethod
     def get_provider(provider_type: str = "dalle") -> ImageProvider:
+        if provider_type == "google" and os.getenv("GOOGLE_API_KEY"):
+            return GoogleImageProvider()
         if provider_type == "dalle" and os.getenv("OPENAI_API_KEY"):
             return DallEProvider()
         return MockImageProvider()

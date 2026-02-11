@@ -55,6 +55,26 @@ Project bootstrap initiated. Platform identified as **Hostinger Website Builder*
 - [Operational Guide](docs/OPERATIONAL_GUIDE.md)
 
 ## Session Logs
+### 2026-02-12 - Checkout Flow Verification COMPLETED
+- **Goal**: Resolve pending verification of Shop and Checkout pages.
+- **Actions**:
+  - Performed full journey from Shop -> PDP -> Cart -> Checkout (Payment screen).
+  - Verified Razorpay integration and discount code placement.
+  - Documented progressive address fields in checkout.
+  - Updated `findings/site_snapshot.md` with validated details.
+  - Closed `docs/checkout_flow_checklist.md`.
+- **Findings**: Shipping is "Free" at ₹1300; Discount code field is in checkout summary, not cart drawer.
+
+### 2026-02-11 - Deep Site Inspection & Documentation Update
+- **Goal**: Thoroughly understand the website structure, UI components, and integrations.
+- **Actions**:
+  - Performed automated browser inspection of `benefills.com`.
+  - Mapped out full content structure (Hero, Benefits, Testimonials, Footer).
+  - Verified 3rd-party scripts: **GA4 (G-GWST8MBK4P)** and **Meta Pixel** are confirmed present in the code.
+  - Confirmed contact details and address in Hyderabad.
+  - Updated `findings/site_snapshot.md` with granular details.
+- **Next Steps**: Proceed with GA4 setup/configuration only if current setup is insufficient (ID is present).
+
 ### 2026-02-02 - Site Exploration & Documentation update
 - Explored `benefills.com` structure and checkout flow.
 - Researched Hostinger Website Builder operations (Editor, Store, Integrations).

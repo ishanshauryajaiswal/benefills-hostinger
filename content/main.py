@@ -7,6 +7,7 @@ from modules.audio import AudioFactory
 from modules.video import VideoFactory
 from modules.assembly import VideoEditor
 from modules.designer import ImageFactory
+from modules.image_prompts import ImagePrompts
 
 from modules.logger import setup_logger
 
@@ -15,7 +16,9 @@ logger = setup_logger('engine', 'content/logs/engine.log')
 def main():
     parser = argparse.ArgumentParser(description="Benefills Brand Presence Engine")
     parser.add_argument("--topic", type=str, required=True, help="Topic for the Instagram Content")
-    parser.add_argument("--format", type=str, choices=["reel", "carousel"], default="reel", help="Format of content")
+    parser.add_argument("--format", type=str, choices=["reel", "carousel"], default="carousel", help="Format of content")
+    parser.add_argument("--style", type=str, choices=["poster", "flatlay", "cookbook", "grid", "editorial", "amazon", "lifestyle"], default="poster", help="Style of image generation")
+    parser.add_argument("--image-provider", type=str, choices=["dalle", "google"], default="google", help="Provider for image generation")
     parser.add_argument("--mock", action="store_true", help="Run in mock mode without API calls")
     args = parser.parse_args()
 
@@ -51,7 +54,7 @@ def main():
 
             # Step 2b: Generate Images for Slides
             print(f"[2b/5] Extracting visual prompts and generating images...")
-            image_provider = "mock" if args.mock else "dalle"
+            image_provider = "mock" if args.mock else args.image_provider
             designer = ImageFactory.get_provider(image_provider)
             
             # More robust parsing for Slide visuals
@@ -75,7 +78,8 @@ def main():
                                 break
                 
                 if prompt_block:
-                    refined_prompt = f"Instagram carousel slide for 'Benefills' brand. {prompt_block}. Hyper-realistic, professional, minimalist aesthetic."
+                    # Refine prompt using the selected style strategy
+                    refined_prompt = ImagePrompts.get_prompt(args.style, f"'Benefills' brand: {prompt_block}")
                     img_filename = f"slide_{i}.png"
                     img_path = os.path.join(carousel_dir, img_filename)
                     
