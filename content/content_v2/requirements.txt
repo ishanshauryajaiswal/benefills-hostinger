@@ -1,0 +1,7 @@
+anthropic
+google-generativeai
+python-dotenv
+requests
+Pillow
+instaloader
+pydantic

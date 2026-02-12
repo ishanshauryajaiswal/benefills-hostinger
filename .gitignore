@@ -21,6 +21,12 @@ content/temp/*
 content/logs/*
 content/outputs/*
 
+# Content V2 pipeline
+content/content_v2/output/
+content/content_v2/output/*
+!content/content_v2/output/.gitkeep
+content/content_v2/.env
+
 # Local settings
 .vscode/
 .idea/

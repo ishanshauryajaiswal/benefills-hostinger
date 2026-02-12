@@ -1,0 +1,89 @@
+{
+  "brand_name": "Benefills",
+  "tagline": "Your go-to for Thyroid Nourishment",
+  "website": "benefills.com",
+  "colors": {
+    "primary": "Purple (lavender/lilac)",
+    "secondary": "White",
+    "accent": ["Fresh Green", "Warm Beige"]
+  },
+  "typography": {
+    "headlines": "Clean serif, editorial feel",
+    "body": "Sans-serif, modern and readable"
+  },
+  "products": [
+    "Seeds Boost Bar",
+    "Nut-ella Nut Butter",
+    "Kunafa Butter",
+    "Thyrovibe Care Packs",
+    "Duo Packs",
+    "Monthly Packs"
+  ],
+  "key_ingredients": [
+    "Selenium",
+    "Zinc",
+    "Ashwagandha",
+    "Mixed Nuts",
+    "Seeds",
+    "Functional Superfoods"
+  ],
+  "topics": [
+    "Thyroid Health",
+    "Functional Foods",
+    "Metabolism Boost",
+    "Steady Energy",
+    "Better Absorption",
+    "Hormone Balance",
+    "Gut-Thyroid Connection"
+  ],
+  "target_audience": {
+    "demographics": "Women 25-45, health-conscious, Indian market",
+    "pain_points": [
+      "Low energy and fatigue",
+      "Metabolism issues",
+      "Thyroid health concerns",
+      "Finding clean/functional snacks"
+    ],
+    "desires": [
+      "Natural health solutions",
+      "Tasty yet healthy food",
+      "Science-backed nutrition",
+      "Convenience"
+    ]
+  },
+  "brand_voice": {
+    "tone": "Expert yet accessible, empathetic, science-backed",
+    "style": "Health-focused, warm, empowering",
+    "avoid": [
+      "Medical claims",
+      "Fear-mongering",
+      "Overly clinical language"
+    ]
+  },
+  "social_media": {
+    "platform": "Instagram",
+    "content_types": ["Image Posts", "Carousels", "Reels"],
+    "hashtags_seed": [
+      "#Benefills",
+      "#ThyroidHealth",
+      "#FunctionalFoods",
+      "#CleanEating",
+      "#HealthySnacks",
+      "#NutButter",
+      "#ThyroidNourishment",
+      "#WellnessJourney"
+    ],
+    "cta_options": [
+      "Link in bio",
+      "Shop now at benefills.com",
+      "Use code FIRSTLOVE20 for 20% off"
+    ]
+  },
+  "instagram_post_specs": {
+    "image_ratio": "1:1 or 4:5",
+    "image_size_1x1": "1080x1080",
+    "image_size_4x5": "1080x1350",
+    "caption_max_chars": 2200,
+    "hashtag_limit": 30
+  }
+}
