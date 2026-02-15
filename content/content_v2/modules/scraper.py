@@ -63,7 +63,8 @@ class InstaLoaderScraper(BaseScraper):
             download_geotags=False,
             download_comments=False,
             save_metadata=False,
-            compress_json=False
+            compress_json=False,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         )
 
         scraped = []
@@ -150,10 +151,20 @@ class MockScraper(BaseScraper):
         scraped = []
         os.makedirs(output_dir, exist_ok=True)
 
+        # Try to find a placeholder image
+        placeholder_path = os.path.join(os.path.dirname(__file__), '..', 'output', 'test_benefills_gen.png')
+        
         for i, url in enumerate(urls):
-            img_path = os.path.join(output_dir, f"inspo_{i+1}.txt")
-            with open(img_path, 'w') as f:
-                f.write(f"[MOCK IMAGE from {url}]")
+            if os.path.exists(placeholder_path):
+                img_path = os.path.join(output_dir, f"inspo_{i+1}.png")
+                import shutil
+                shutil.copy(placeholder_path, img_path)
+                logger.info(f"[MOCK] Copied placeholder scraper image: {img_path}")
+            else:
+                img_path = os.path.join(output_dir, f"inspo_{i+1}.txt")
+                with open(img_path, 'w') as f:
+                    f.write(f"[MOCK IMAGE from {url}]")
+                logger.info(f"[MOCK] Created text placeholder: {img_path}")
 
             scraped.append(ScrapedPost(
                 image_path=img_path,

@@ -260,9 +260,17 @@ class MockImageGenerator(BaseImageGenerator):
 
     def generate(self, prompt: str, output_path: str, style: str = "lifestyle") -> str:
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        with open(output_path, 'w') as f:
-            f.write(f"[MOCK IMAGE]\nStyle: {style}\nPrompt: {prompt}")
-        logger.info(f"[MOCK] Image saved: {output_path}")
+        # Try to use a real image as mock if available to avoid "corrupt" image errors in frontend
+        placeholder_path = os.path.join(os.path.dirname(__file__), '..', 'output', 'test_benefills_gen.png')
+        if os.path.exists(placeholder_path):
+             import shutil
+             shutil.copy(placeholder_path, output_path)
+             logger.info(f"[MOCK] Copied placeholder image to: {output_path}")
+        else:
+            # Fallback to text file if no placeholder exists
+            with open(output_path, 'w') as f:
+                f.write(f"[MOCK IMAGE]\nStyle: {style}\nPrompt: {prompt}")
+            logger.info(f"[MOCK] Image saved (text-only): {output_path}")
         return output_path
 
 
