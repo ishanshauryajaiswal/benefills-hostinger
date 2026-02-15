@@ -73,3 +73,5 @@ Here is the step-by-step process of how the system generates content:
 
 ---
 *Note for Marketing: To improve the output, tweak the instruction files in "The Skills" or the strategy documents in "The Brain".*
+
+AIzaSyDof-ULqXYgbRPs_-bVn2rwLQw1RybZZN42R
