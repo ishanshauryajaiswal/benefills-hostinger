@@ -1,7 +1,7 @@
 """
 Instagram scraper module.
-Fetches images and captions from public Instagram posts using instaloader.
-Falls back gracefully if scraping fails (e.g., private account, rate limit).
+Fetches images and captions from public Instagram posts using Playwright.
+Falls back gracefully if scraping fails.
 """
 
 import os
@@ -47,101 +47,7 @@ class BaseScraper(ABC):
         pass
 
 
-class InstaLoaderScraper(BaseScraper):
-    """Scrapes public Instagram posts using instaloader."""
 
-    def scrape_posts(self, urls: List[str], output_dir: str) -> List[ScrapedPost]:
-        try:
-            import instaloader
-        except ImportError:
-            logger.error("instaloader not installed. Run: pip install instaloader")
-            raise
-
-        loader = instaloader.Instaloader(
-            download_videos=False,  # Images only for now
-            download_video_thumbnails=False,
-            download_geotags=False,
-            download_comments=False,
-            save_metadata=False,
-            compress_json=False,
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-        )
-
-        scraped = []
-        os.makedirs(output_dir, exist_ok=True)
-
-        for i, url in enumerate(urls):
-            try:
-                logger.info(f"Scraping post {i+1}/{len(urls)}: {url}")
-
-                # Extract shortcode from URL
-                shortcode = self._extract_shortcode(url)
-                if not shortcode:
-                    logger.warning(f"Could not extract shortcode from: {url}")
-                    continue
-
-                # Download to a temp directory then move what we need
-                with tempfile.TemporaryDirectory() as tmp_dir:
-                    post = instaloader.Post.from_shortcode(loader.context, shortcode)
-
-                    # Download just the image
-                    loader.download_post(post, target=tmp_dir)
-
-                    # Find the downloaded image
-                    img_file = None
-                    for f in os.listdir(tmp_dir):
-                        if f.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
-                            img_file = f
-                            break
-
-                    if img_file:
-                        dest_path = os.path.join(output_dir, f"inspo_{i+1}.jpg")
-                        shutil.copy2(os.path.join(tmp_dir, img_file), dest_path)
-
-                        scraped.append(ScrapedPost(
-                            image_path=dest_path,
-                            caption=post.caption or "",
-                            source_url=url,
-                            likes=post.likes,
-                            comments=post.comments
-                        ))
-                        logger.info(f"  ✓ Scraped successfully ({post.likes} likes)")
-                    else:
-                        logger.warning(f"  ✗ No image found in download for: {url}")
-
-            except Exception as e:
-                logger.error(f"  ✗ Failed to scrape {url}: {str(e)}")
-                continue
-
-        return scraped
-
-    def load_local_images(self, image_paths: List[str], output_dir: str) -> List[ScrapedPost]:
-        """Load local images as ScrapedPost objects (for when user provides images directly)."""
-        scraped = []
-        os.makedirs(output_dir, exist_ok=True)
-
-        for i, path in enumerate(image_paths):
-            if os.path.isfile(path):
-                dest_path = os.path.join(output_dir, f"inspo_{i+1}{os.path.splitext(path)[1]}")
-                shutil.copy2(path, dest_path)
-                scraped.append(ScrapedPost(
-                    image_path=dest_path,
-                    caption="[Local image — no caption available]",
-                    source_url=f"file://{os.path.abspath(path)}"
-                ))
-                logger.info(f"Loaded local image: {path}")
-            else:
-                logger.warning(f"Image not found: {path}")
-
-        return scraped
-
-    @staticmethod
-    def _extract_shortcode(url: str) -> Optional[str]:
-        """Extract Instagram shortcode from various URL formats."""
-        import re
-        # Matches: /p/SHORTCODE/ or /reel/SHORTCODE/
-        match = re.search(r'/(p|reel)/([A-Za-z0-9_-]+)', url)
-        return match.group(2) if match else None
 
 
 class MockScraper(BaseScraper):
