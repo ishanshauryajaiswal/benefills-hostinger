@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-import { ArrowRight, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { ArrowRight, Image as ImageIcon, Sparkles, LayoutGrid } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -16,43 +16,56 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Inspiration Card */}
           <Link
             href="/inspiration"
-            className="group relative bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden"
+            className="group relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden"
           >
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <ImageIcon size={120} />
-            </div>
             <div className="relative z-10 space-y-4">
               <div className="p-3 bg-purple-100 w-fit rounded-lg text-purple-600">
-                <ImageIcon size={28} />
+                <ImageIcon size={24} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Inspiration Library</h2>
-              <p className="text-gray-500">
+              <h2 className="text-xl font-bold text-gray-900">Inspiration Library</h2>
+              <p className="text-sm text-gray-500">
                 Curate source material. Add Instagram links or upload reference images for the AI to analyze.
               </p>
-              <div className="flex items-center text-purple-600 font-medium group-hover:translate-x-1 transition-transform">
-                Manage Inputs <ArrowRight size={18} className="ml-2" />
+              <div className="flex items-center text-purple-600 font-medium group-hover:translate-x-1 transition-transform text-sm">
+                Manage Inputs <ArrowRight size={16} className="ml-2" />
+              </div>
+            </div>
+          </Link>
+
+          {/* Gallery Card */}
+          <Link
+            href="/gallery"
+            className="group relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden"
+          >
+            <div className="relative z-10 space-y-4">
+              <div className="p-3 bg-teal-100 w-fit rounded-lg text-teal-600">
+                <LayoutGrid size={24} />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Output Gallery</h2>
+              <p className="text-sm text-gray-500">
+                Review all generated posts. Inspect captions, exact prompts, and brand alignment scores.
+              </p>
+              <div className="flex items-center text-teal-600 font-medium group-hover:translate-x-1 transition-transform text-sm">
+                View Results <ArrowRight size={16} className="ml-2" />
               </div>
             </div>
           </Link>
 
           {/* Generator Card (Placeholder for now) */}
-          <div className="group relative bg-gray-50 p-8 rounded-2xl border border-dashed border-gray-300 opacity-60 hover:opacity-100 transition-opacity cursor-not-allowed">
-            <div className="absolute top-0 right-0 p-4 opacity-5">
-              <Sparkles size={120} />
-            </div>
+          <div className="group relative bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-300 opacity-60 transition-opacity cursor-not-allowed">
             <div className="relative z-10 space-y-4">
               <div className="p-3 bg-gray-200 w-fit rounded-lg text-gray-500">
-                <Sparkles size={28} />
+                <Sparkles size={24} />
               </div>
-              <h2 className="text-2xl font-bold text-gray-400">Content Generator</h2>
-              <p className="text-gray-400">
-                Run the generation pipeline. Configure style, variants, and review generated posts.
+              <h2 className="text-xl font-bold text-gray-400">Content Generator</h2>
+              <p className="text-sm text-gray-400">
+                Run the generation pipeline autonomously. Configure style, variants, and review posts.
               </p>
-              <div className="flex items-center text-gray-400 font-medium">
+              <div className="flex items-center text-gray-400 font-medium text-sm">
                 Coming Soon
               </div>
             </div>
