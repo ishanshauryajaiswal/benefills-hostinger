@@ -60,6 +60,8 @@ Examples:
                              help="Path to a text file with one Instagram URL per line")
     input_group.add_argument("--images", nargs="+", type=str,
                              help="Paths to local inspiration images")
+    input_group.add_argument("--topic", type=str,
+                             help="Topic/Theme for generating content from scratch (no inspiration needed)")
 
     # Generation options
     gen_group = parser.add_argument_group('Generation Options')
@@ -123,11 +125,11 @@ def collect_inputs(args) -> dict:
             else:
                 logger.warning(f"Invalid image file (skipping): {path}")
 
-    if not links and not images:
-        logger.error("No valid inputs provided. Use --links, --links-file, or --images.")
+    if not links and not images and not args.topic:
+        logger.error("No valid inputs provided. Use --links, --links-file, --images, or --topic.")
         sys.exit(1)
 
-    return {"links": links, "images": images}
+    return {"links": links, "images": images, "topic": args.topic}
 
 
 def main():
@@ -165,41 +167,57 @@ def main():
         })
         print(f"       Found {len(inputs['links'])} links, {len(inputs['images'])} images")
 
-        # ── Step 3: Scrape / Load Inspiration ───────────────────
-        print("[3/6] Fetching inspiration content...")
-        scraper = ScraperFactory.get_scraper(mock=args.mock)
-        scraped_dir = os.path.join(run_dir, "scraped")
-        scraped_posts = []
-
-        if inputs["links"] and not args.skip_scrape:
-            scraped_posts.extend(scraper.scrape_posts(inputs["links"], scraped_dir))
-
-        if inputs["images"]:
-            scraped_posts.extend(scraper.load_local_images(inputs["images"], scraped_dir))
-
-        if not scraped_posts:
-            logger.error("No inspiration content could be loaded.")
-            run_log.log_step("scrape", "failed", {"reason": "no content loaded"})
-            run_log.save()
-            sys.exit(1)
-
-        run_log.log_step("scrape", "success", {
-            "posts_scraped": len(scraped_posts)
-        })
-        print(f"       Loaded {len(scraped_posts)} inspiration posts")
-
-        # ── Step 4: Analyze Inspiration ─────────────────────────
-        print("[4/6] Analyzing inspiration content...")
-        analyzer = AnalyzerFactory.get_analyzer(
-            provider=args.text_provider, mock=args.mock
-        )
-
         all_analyses = []
-        for i, post in enumerate(scraped_posts):
-            print(f"       Analyzing post {i+1}/{len(scraped_posts)}...")
-            analysis = analyzer.analyze(post.image_path, post.caption, brand_context)
-            analysis["_source"] = post.to_dict()
-            all_analyses.append(analysis)
+        if inputs["topic"]:
+            # ── Scratch Mode ────────────────────────────────────────
+            print(f"[4/6] Generating concept for topic: '{inputs['topic']}'...")
+            
+            # Use 'analyze_inspo' analyzer for now, but we call generate_concept
+            # Ideally we might want a separate factory for ideators, but reusing analyzer is fine
+            analyzer = AnalyzerFactory.get_analyzer(
+                provider=args.text_provider, mock=args.mock
+            )
+            
+            concept = analyzer.generate_concept(inputs["topic"], brand_context)
+            all_analyses.append(concept)
+            print(f"       Concept generated for topic.")
+
+        else:
+            # ── Inspiration Mode ────────────────────────────────────
+            # ── Step 3: Scrape / Load Inspiration ───────────────────
+            print("[3/6] Fetching inspiration content...")
+            scraper = ScraperFactory.get_scraper(mock=args.mock)
+            scraped_dir = os.path.join(run_dir, "scraped")
+            scraped_posts = []
+
+            if inputs["links"] and not args.skip_scrape:
+                scraped_posts.extend(scraper.scrape_posts(inputs["links"], scraped_dir))
+
+            if inputs["images"]:
+                scraped_posts.extend(scraper.load_local_images(inputs["images"], scraped_dir))
+
+            if not scraped_posts:
+                logger.error("No inspiration content could be loaded.")
+                run_log.log_step("scrape", "failed", {"reason": "no content loaded"})
+                run_log.save()
+                sys.exit(1)
+
+            run_log.log_step("scrape", "success", {
+                "posts_scraped": len(scraped_posts)
+            })
+            print(f"       Loaded {len(scraped_posts)} inspiration posts")
+
+            # ── Step 4: Analyze Inspiration ─────────────────────────
+            print("[4/6] Analyzing inspiration content...")
+            analyzer = AnalyzerFactory.get_analyzer(
+                provider=args.text_provider, mock=args.mock
+            )
+
+            for i, post in enumerate(scraped_posts):
+                print(f"       Analyzing post {i+1}/{len(scraped_posts)}...")
+                analysis = analyzer.analyze(post.image_path, post.caption, brand_context)
+                analysis["_source"] = post.to_dict()
+                all_analyses.append(analysis)
 
         # Save combined analysis
         analysis_path = os.path.join(run_dir, "analysis.json")

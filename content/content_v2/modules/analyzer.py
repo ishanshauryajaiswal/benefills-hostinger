@@ -23,6 +23,11 @@ class BaseAnalyzer(ABC):
     def analyze(self, image_path: str, caption: str, brand_context: dict) -> dict:
         pass
 
+    @abstractmethod
+    def generate_concept(self, topic: str, brand_context: dict) -> dict:
+        """Generate a concept analysis from scratch based on a topic."""
+        pass
+
 
 class ClaudeAnalyzer(BaseAnalyzer):
     """Uses Claude to analyze inspiration content (supports vision)."""
@@ -99,6 +104,40 @@ Provide a structured analysis as JSON following the framework in your system pro
 
         return analysis
 
+    def generate_concept(self, topic: str, brand_context: dict) -> dict:
+        system_prompt = load_prompt("ideate_concept")
+        
+        user_prompt = f"""
+Topic: {topic}
+
+Brand Context:
+- Brand: {brand_context.get('brand_name', 'Benefills')}
+- Products: {', '.join(brand_context.get('products', []))}
+- Topics: {', '.join(brand_context.get('topics', []))}
+- Target Audience: {json.dumps(brand_context.get('target_audience', {}), indent=2)}
+
+Generate a detailed concept for an Instagram post about this topic.
+"""
+        
+        message = self.client.messages.create(
+            model="claude-sonnet-4-5-20250929",
+            max_tokens=2000,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}]
+        )
+        
+        response_text = message.content[0].text
+        analysis = extract_json_from_text(response_text)
+        
+        if analysis is None:
+            logger.warning("Could not parse JSON from concept generation, returning raw text")
+            analysis = {"raw_analysis": response_text}
+            
+        # Add metadata so downstream tools know source
+        analysis["_source"] = {"type": "scratch", "topic": topic}
+        
+        return analysis
+
 
 class GeminiAnalyzer(BaseAnalyzer):
     """Uses Gemini to analyze inspiration content."""
@@ -152,6 +191,32 @@ Return structured JSON analysis.
 
         return analysis
 
+    def generate_concept(self, topic: str, brand_context: dict) -> dict:
+        system_prompt = load_prompt("ideate_concept")
+        
+        user_prompt = f"""
+{system_prompt}
+
+Topic: {topic}
+
+Brand Context:
+- Brand: {brand_context.get('brand_name', 'Benefills')}
+- Products: {', '.join(brand_context.get('products', []))}
+- Topics: {', '.join(brand_context.get('topics', []))}
+
+Generate structured JSON concept.
+"""
+        
+        response = self.model.generate_content(user_prompt)
+        analysis = extract_json_from_text(response.text)
+        
+        if analysis is None:
+            analysis = {"raw_analysis": response.text}
+            
+        analysis["_source"] = {"type": "scratch", "topic": topic}
+        
+        return analysis
+
 
 class MockAnalyzer(BaseAnalyzer):
     """Mock analyzer for testing."""
@@ -182,6 +247,35 @@ class MockAnalyzer(BaseAnalyzer):
                 "what_to_skip": "Generic wellness messaging without specific claims",
                 "benefills_angle": "Tie to thyroid health with Selenium/Zinc callout"
             }
+        }
+
+    def generate_concept(self, topic: str, brand_context: dict) -> dict:
+        logger.info(f"[MOCK] Generating concept for topic: {topic}")
+        return {
+            "visual_aesthetics": {
+                "color_palette": "Fresh greens and whites",
+                "composition": "Minimalist product shot",
+                "lighting": "Bright studio lighting",
+                "typography": "Clean sans-serif",
+                "props": "Fresh ingredients related to topic"
+            },
+            "content_strategy": {
+                "hook_type": "Did you know?",
+                "value_proposition": "Simple health hack",
+                "content_format": "Infographic style",
+                "cta_approach": "Save for later"
+            },
+            "engagement_elements": {
+                "caption_structure": "Question -> Answer -> CTA",
+                "emotional_trigger": "Curiosity",
+                "shareability": "High utility"
+            },
+            "adaptation_notes": {
+                "what_to_borrow": "Clean layout",
+                "what_to_skip": "Clutter",
+                "benefills_angle": "Thyroid-friendly twist"
+            },
+            "_source": {"type": "scratch", "topic": topic}
         }
 
 
