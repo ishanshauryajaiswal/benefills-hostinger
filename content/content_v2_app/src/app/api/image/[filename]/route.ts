@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-export async function GET(req: Request, { params }: { params: { filename: string } }) {
-    const { filename } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ filename: string }> }) {
+    const { filename } = await params;
     const CONTENT_V2_DIR = path.resolve(process.cwd(), '..', 'content_v2');
     const filePath = path.join(CONTENT_V2_DIR, 'input', filename);
 
